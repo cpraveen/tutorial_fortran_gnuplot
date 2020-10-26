@@ -1,0 +1,837 @@
+\documentclass[11pt,oneside]{amsart}
+\usepackage[width=16cm,height=25cm]{geometry}
+\geometry{a4paper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{listings}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, % make the links colored
+    linkcolor=blue, % color TOC links in blue
+    urlcolor=red, % color URLs in red
+    citecolor=magenta,
+    linktoc=all % 'all' will create links for everything in the TOC
+}
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage[english]{babel}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\newcommand{\re}{\mathbb{R}}
+\newcommand{\ud}{\textrm{d}}
+\newcommand{\dd}[2]{\frac{\ud #1}{\ud #2}}
+\newcommand{\df}[2]{\frac{\partial #1}{\partial #2}}
+
+\title{Tutorial on Scientific Computing \\using Fortran and Gnuplot}
+\author{Praveen. C}
+\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\lstset{basicstyle=\ttfamily,language=fortran, frame=single,showstringspaces=false,
+numbers=left,numberstyle=\footnotesize}
+
+\section{Introduction}
+In this tutorial, we will learn the basics of programming with a view towards numerical computing. We will study and write simple programs\footnote{We will use the terms {\em program} and {\em code} to refer to a computer program.} in fortran to solve some elementary problems in numerical analysis. The best way to learn a new programming language is to read many examples of code and to actually write your own code. So the tutorial will give you many examples of small computer codes which solve some equation. The theory behind the numerical method will not be explained in this tutorial. It is assumed that you already have some knowledge with numerical analysis, like root finding, solution of system of linear equations, solution of ODE and PDE. However in every example the numerical recipe will be fully given so that you can use it to write a program. You will also learn the use of plotting software to visualize the results of  numerical computing. 
+
+\subsection{Pre-requisites}
+
+This tutorial will assume that you are using a UNIX/Linux/MAC computer. We will assume that you know how to use a terminal and execute commands on the terminal. You are also expected to already know how to use a text editor. Examples of text editors are Vi/Vim and Emacs. We will use fortran as the programming language and all examples will be given in fortran. Fortran has been and still is the workhorse of numerical computing. A large number of scientific libraries are written in fortran and it is good to have some knowledge of this important language. However for the purpose of any exercises you are free to write the programs in C.
+
+\subsection{Language and compilers}
+
+The fortran language is under considerable development. The old version of the language is called Fortran-77 which is fast going out of fashion due to emergence of new versions like Fortran-90, Fortran-95 and Fortran-2003. However each new version contains the previous versions as a subset; thus you can compile a Fortran-77 code using a compiler for Fortran-95. We will study fortran-77 first since it is still common to come across code which is written in this language.
+
+The steps you would execute in solving some problem on the computer are:
+
+\begin{enumerate}
+\item Choose a numerical method
+\item Plan the implementation of the method on paper
+\item Write a computer code
+\item Compile it to produce an executable
+\item Run it and look at the results
+\end{enumerate}
+
+Of course in practice, you make mistakes which lead to {\em bugs} in the code. If you do any serious amount of numerical computing, you can expect to spend a considerable amount of time in finding and correcting your own mistakes; this is known as {\em debugging}. 
+
+Today there are several fortran compilers available; some of these are free while others cost money.
+
+\begin{enumerate}
+\item g77 : This is the old Fortran-77 compiler from GNU; it is free.
+\item gfortran: This is the latest fortran compiler from GNU which supports fortran-95 also; it is free.
+\item g95: This is another free fortran-95 compiler which is mostly the work of one individual, Andy Vaught.
+\item ifort: This is the fortran compiler from Intel and is free for Linux and for non-commercial use. For X86-based computers, this is probably the fastest compiler since it is highly optimized for Intel processors.
+\item pgf: The Portland Group develops a fortran compiler called pgf77, pgf90 and pgf95; these are not free.
+\end{enumerate}
+
+All the code examples in this tutorial will (should) compile with any fortran compiler.  In these notes, we will denote the Linux terminal prompt by the dollar symbol
+\begin{verbatim}
+$
+\end{verbatim}
+
+To check that the fortran compiler is installed on your computer, just type the name of the compiler at the command prompt. If you see the following message, it means that the compiler is installed
+
+\begin{verbatim}
+$ gfortran
+gfortran: no input files
+\end{verbatim}
+If you get the following
+\begin{verbatim}
+$ gfortran
+gfortran: command not found
+\end{verbatim}
+it probably means that the compiler is not installed. Even if it is installed, make sure that the path to the compiler is in your {\tt PATH} variable.
+
+%-----------------------------------------------------------------------------
+\section{Programming in fortran 77}
+
+Let us start with a simple program given in Fig. \ref{hello} to illustrate the structure of a fortran code. The first few lines start with the character {\tt c} in the {\em first} column of the code and are considered by the compiler as {\em comments}. These are used to add some description and author information, and are ignored by the compiler.  You can put a comment line anywhere in the program but it must start with a {\tt c} on the first column. The actual program starts with a {\tt program} statement\footnote{This is optional.} and ends with an {\tt end} statement. {\em In fortran-77, all statements except comments start from the seventh column and end on the 72'nd column}. Columns one to five are reserved for line numbers, while column six is used to indicate line continuation when some line exceeds 72 columns. The {\tt print} statement prints a {\em string} to the standard output. Type this program in your text editor and save it under the name {\tt hello.f}; now we compile it with the following command
+
+\begin{verbatim}
+$ gfortran hello.f
+\end{verbatim}
+This will create an executable program called {\tt a.out} in the same directory; you can optionally create an executable with any name you desire, for example
+
+\begin{verbatim}
+$ gfortran -o hello hello.f
+\end{verbatim}
+create an executable named {\tt hello} in the same directory. Executing this program should print the string "Hello World !" on your screen
+
+\begin{verbatim}
+$ ./hello
+ Hello World !
+\end{verbatim}
+
+It is a good practice to write a small description of what the program is supposed to do at the beginning of the file along with some information about who wrote it and when. If you do a lot of programming, you are likely to forget after some time, what a particular piece of program was supposed to do. It is also useful for sharing your code with other people, so that they can more easily make sense of what you have written.
+
+%----------------------------------------------------------------------------
+\subsection{Example: Adding two numbers}
+
+The next example given in Fig. \ref{add} adds two real numbers and prints the sum to the screen. Fortran-77 has an implicit declaration of variable types; any variable whose name starts with the letters {\tt a-h} or {\tt o-z} is considered to be real number and all others are considered to be integers. It is however a good practice to explicitly declare every variable you use since it helps to keep track of all the variables you use and avoids mistakes. Hence the statement {\tt implicit none} declares  that all variables will be explicitly declared. If you do not add this statement, then the compiler assumes that variables are implicitly declared.
+
+In the same example, we also see how to declare {\tt real} variables. When you declare a variable like this, memory is allocated for the variable, but there is no value store in it. You must assign some value to the variable as shown in the example before using it in some computation. A real number is a floating point number that is stored with a finite precision on a computer. The number of decimal places that are stored depends on the computer; {\tt real} numbers (also called {\em single} precision) usually have 6-7 decimal places while {\em double precision} numbers have 15-16 decimal places. You can declare a double precision number using the statement
+\begin{verbatim}
+      real*8 a, b, sum
+\end{verbatim}
+or equivalently
+\begin{verbatim}
+      double precision a, b, sum
+\end{verbatim}
+A double precision variable is initialized as follows
+\begin{verbatim}
+a = 3.141d0
+\end{verbatim}
+Variable names can be made up of alphabets, numbers (for example {\tt x1, a12}) and even the underscore character (for example {\tt x\_vel}).  Even if a program is written using single precision variables, you can tell the compiler to convert all single precision variables to double precision. With gfortran, this can be achieved as follows\footnote{With ifort or g95, the equivalent flag is {\tt -r8}}
+\begin{verbatim}
+$ gfortran -fdefault-real-8 -o add add.f
+\end{verbatim}
+Running the program now produces the following output: note that the number of decimal places is more now.\footnote{Warning: In-spite of this, do not depend on what is printed on the screen to decide the precision; how many decimal places are printed depends on the compiler and not on the actual precision with which the numbers are stored.}
+\begin{verbatim}
+$ ./add
+ a   =  1.00000000000000000     
+ b   =   2.0000000000000000     
+ sum =   3.0000000000000000
+ \end{verbatim}
+ 
+ \noindent {\bf Remark}: More accurately, the precision of a number type on a computer is the largest number $\epsilon$ such that the computer cannot distinguish between $1$ and $1 + \epsilon$.
+ 
+ %----------------------------------------------------------------------------
+\subsection{Example: Comparing two numbers}
+
+This example shows how to use comparison operators in fortran. The result of applying a comparison operator to two numbers is a {\em logical}, i.e., the result is either true or false. Table \ref{tab:comp} gives the comparison operators in fortran. Run the example code in Fig. \ref{compare} and see the output for different values of input. This example also introduces the {\tt if ... else ... endif} statement which naturally arises when you want to compare numbers.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+Operator & Math symbol & Fortran operator \\
+\hline\hline
+Equal to  & $=$ & {\tt .eq.} \\
+\hline
+Less than & $<$ & {\tt .lt.} \\
+\hline
+Greater than & $>$ & {\tt .gt.} \\
+\hline 
+Less than or equal to & $\le$ & {\tt .le.} \\
+\hline
+Greater than or equal to & $\ge$ & {\tt .ge.} \\
+\hline
+\end{tabular}
+\caption{Arithmetic comparison operators in fortran-77}
+\label{tab:comp}
+\end{center}
+\end{table}
+
+Because of the finite precision of a computer, real numbers cannot be stored exactly. For example the number 1/3 which has an infinite decimal representation is only stored approximately in a computer. If you compute {\tt 3.0 * (1.0 / 3.0)} on a computer, the answer is not exactly 1.0; hence one should be careful in making comparisons of real numbers.
+
+%----------------------------------------------------------------------------
+\subsection{Example: Sum of a sequence of numbers}
+
+This example illustrates the use of an {\tt array} of numbers. The code computes the sum of {\tt n} numbers. The numbers are stored in an array of real variables called {\tt val}; note that the memory for this array is allocated at the same time the variable is declared. In fortran-77, the size of an array is hard-coded into the program. In this example we declare a {\em constant} {\tt nmax} using the {\tt parameter} statement, which is the size of the array. The actual size {\tt n} of the array that the user wants to add is then read by prompting the user to enter a number. It is always good practice to check that any value entered by the user is {\em valid} for the purpose that it will be used. For example, in the present case, if the user requests to add 1000 numbers, the program will not work because it can handle at most 100 numbers (since we have {\tt nmax=100}). Also {\tt n} should be a positive integer, since otherwise the sum does not make sense.
+
+The {\tt do ... enddo} construct is useful to perform a fixed sequence of operations. Here, it is first used to initialize the array {\tt val} and then to compute the sum. The general structure of this loop is
+\begin{verbatim}
+      do i = ibegin, iend, incr
+         perform some operations
+      enddo
+\end{verbatim}
+For example, the following loop
+\begin{verbatim}
+      do i = 0, 10, 2
+         perform some operations
+      enddo
+\end{verbatim}
+is executed for {\tt i=0,2,4,6,8,10} only. One can also loop from $n>1$ to 1 using a negative increment as follows
+\begin{verbatim}
+      do i = n, 1, -1
+         perform some operations
+      enddo
+\end{verbatim}
+It is also common to use the following form of the {\tt do} loop.
+\begin{verbatim}
+      do 20 i = n, 1, -1
+         perform some operations
+20    continue
+\end{verbatim}
+In this case, the line number 20 must be written in columns 1-5 only.\\
+
+\noindent {\em Remark}: Note that a statement like {\tt sum = sum + val(i)} is not a mathematical equation. What this means is that we want to take the current value of {\tt sum}, compute the right hand side and assign the result to the variable {\tt sum}. This situation arises very often when writing an iterative numerical scheme.
+%----------------------------------------------------------------------------
+\subsection{Example: Writing to a file}
+
+In this example given in Fig. \ref{sine}, we will see how to write data to a file. We will compute the following function
+\begin{equation*}
+y = \sin(2 \pi x), \quad x \in [0,1]
+\end{equation*}
+on a one dimensional {\em grid} and save the values to a file. Let us divide the interval $[0,1]$ into $n-1$ parts each of length $\Delta x = 1/(n-1)$, so that there are $n$ points
+\begin{equation}
+x_i = (i-1) \Delta x, \quad i=1,\ldots,n
+\end{equation}
+We compute the function values $y_i = y(x_i)$ at each $x_i, i=1,\ldots,n$, and save them to file. After running this program, a new file called {\tt sine.dat} will be created in the same directory; open this file in your text editor and check that there are two columns of numbers corresponding to the $x_i$ and $y_i$.
+
+\begin{table}[htp]
+\caption{Some mathematical functions in fortran}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Function & Single precision & Double precision \\
+\hline
+sine & {\tt sin} & {\tt dsin} \\
+\hline
+cosine & {\tt cos} & {\tt dcos} \\
+\hline
+tangent & {\tt tan} & {\tt dtan} \\
+\hline
+Sine inverse & {\tt asin} & {\tt dasin} \\
+\hline
+Natural log & {\tt log} & {\tt dlog} \\
+\hline
+Log base 10 & {\tt log10} & {\tt dlog10} \\
+\hline
+\end{tabular}
+\end{center}
+\label{tab:math}
+\end{table}%
+
+The example uses some standard mathematical functions like {\tt atan} which is $\tan^{-1}$ and {\tt sin} which is just the sine function. Table \ref{tab:math} lists some of the standard mathematical functions available in fortran. Note that there is a different function for single and double precision arguments and you should be careful to use the correct version in your own program.
+
+The next new concept in this example is writing to a file. Every file is assigned an integer number using which you can access the file. In the example, we assign the integer id 10 to the file {\tt sine.dat}, then open the file, write some data into it and finally close the file. We use {\tt write} in this case because {\tt print*} can write to the standard output and not to a file. The asterisk in the {\tt write} statement means that you let the compiler decide how many decimal places to print, etc. You can control the way numbers are printed using {\tt formatting}, for example
+
+\begin{verbatim}
+      write(fid,'(i5,3x,f12.4,3x,e12.4)') i, x(i), y(i)
+\end{verbatim}
+The meaning of the format is as follows:
+\begin{itemize}
+\item {\tt i5}: Print an integer in the first five columns, right justified
+\item {\tt 3x}: Leave three blank spaces
+\item {\tt f12.4}: Print a floating point number in 12 columns with four decimal places
+\item {\tt 3x}: Leave three blank spaces
+\item {\tt e12.4}: Print a floating point number in exponential form with four decimal places
+\end{itemize}
+Using a format statement has several advantages. It achieves consistency in the output across all compilers. You can print only the required number of digits for your purpose which can save memory. Also it is easier to read when you print numbers in a formatted way. The format string can also be specified in a separate statement as follows
+\begin{verbatim}
+      write(fid,20) i, x(i), y(i)
+20    format(i5,3x,f12.4,3x,e12.4)
+\end{verbatim}
+When you explicitly specify the format, make sure there is atleast one empty space between two adjacent columns. For printing floating point numbers, use the appropriate type of format {\tt f} or {\tt e} depending on the numerical magnitude of the numbers; if the number is very small or very large, it is better to use exponential format. \\
+
+\noindent {\em Remark}: If a file of the same name already exists, then it will be overwritten by the write statement. To prevent over-writing an existing file, add the {\tt status} identifier
+\begin{verbatim}
+      open(unit=fid, file='sine.dat', status='new')
+\end{verbatim}
+If the file {\tt sine.dat} already exists, the program will abort. This is useful to prevent accidentally over-writing a file that you do not want to modify.
+
+%----------------------------------------------------------------------------
+\subsection{Example: Reading from a file}
+
+Reading data from a file is also performed similar to writing. Below is an example to read a file containing two columns of numbers, the first column being integers and the second column reals.
+\begin{verbatim}
+      integer i, num(100)
+      real    x(100)
+      open(unit=20, file='sample.dat', status='old')
+      do i=1,100
+         read(20,*) num(i), x(i)
+      enddo
+      close(20)
+\end{verbatim}
+The {\tt status} identifier will cause the program to check if the file exists; if it does not exist, then the program will abort with an error message. You do not have to specify formatting while reading unless you know the exact format in which the file has been written.
+
+%----------------------------------------------------------------------------
+\subsection{Example: Finding zeros of a function using Newton method}
+
+Consider the problem of finding the roots of a non-linear function $f: \re \to \re$ using Newton's method. In this method we make an initial guess $x_o$ and then {\em iteratively} improve this guess using the formula
+\begin{equation}
+x^{i+1} = x^i - \frac{ f(x^i) }{ f'(x^i) }
+\end{equation}
+Every numerical scheme has some or all of these ingredients:
+\begin{itemize}
+\item initial condition
+\item boundary condition
+\item stability condition
+\item iterative scheme
+\item convergence test
+\end{itemize}
+Fig. \ref{newton} gives an implementation of this method. The new programming concepts we see in this example are the {\tt do while} loop and {\em functions}.  The {\tt do} loop which we have encountered before is useful when we know the end point of the loop, for example when summing an array of numbers. In the present case, we do not know how many iterations are required to achieve convergence. In the example, we stop the iterations when $| f(x^i)| < \epsilon$ for some small $\epsilon > 0$ for which the {\tt do while} construct is useful. In some cases, you may never achieve convergence, but you do not want the program to continue forever. So we also impose a restriction on the maximum number of iterations, after which program will terminate even if convergence has not been achieved. It is a good practice to print a warning message in such situations.
+
+This example uses two fortran functions, one ({\tt fun\_val}) for computing the function value and another ({\tt fun\_der}) for computing its derivative. A function takes one or more arguments and returns some value; here each function takes one double precision argument and returns a double precision value. If tomorrow you want to solve a new equation, you have to just modify the two functions while the main program remains unchanged. This modularity helps to manage your code better, improves understanding and promotes code reuse. \\
+
+\noindent {\em Remark}: In the statement {\tt x = x - f/fd}, the division is first performed and then the subtraction, which is what we want in this case. When a complex arithmetic expression is used, it is important to ensure the correct precedence of operations. For example {\tt a*t**2} evaluates $at^2$ and not $(at)^2$; to evaluate the second form, use {\tt (a*t)**2}. Whenever in doubt about the order of evaluation of an expression, use brackets to avoid the ambiguity.
+
+%----------------------------------------------------------------------------
+\subsection{Example: Solving two dimensional Laplace equation}
+\label{lap}
+In this example, we solve the following problem
+\begin{eqnarray*}
+\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} &=& f(x,y), \quad (x,y) \in \Omega = (0,1) \times (0,1) \\
+u &=& 0 \quad \textrm{on} \quad \partial \Omega
+\end{eqnarray*}
+Construct a 2-D mesh using $n_x$ partitions along $x$-axis and $n_y$ partitions along $y$-axis, so that the grid points are $(x_i,y_j) = ((i-1)\Delta x, (j-1)\Delta y)$, $i=1,\ldots,n_x$, $j=1,\ldots,n_y$ and where $\Delta x = 1/(n_x-1)$ and $\Delta y = 1/(n_y-1)$. Using finite differences, the numerical approximation to the above PDE is given by
+\begin{equation*}
+\frac{u_{i-1,j} - 2 u_{i,j} + u_{i+1,j}}{\Delta x^2} +
+\frac{u_{i,j-1} - 2 u_{i,j} + u_{i,j+1}}{\Delta y^2} = f_{i,j}, \quad 2 \le i \le n_x-1, \quad 2 \le j \le n_y-1
+\end{equation*}
+where $f_{i,j} = f(x_i, y_j)$ and $u_{i,j}$ is an approximation to the solution at $(x_i,y_j)$. The above equation is a system of linear equations of the form $AU=F$ where $A$ is a matrix of size $N \times N$ where $N=(n_x-2)(n_y-2)$. While there are many good methods to solve such equations, we will use a simple method here. Solving for $u_{i,j}$ we obtain
+\begin{equation*}
+u_{i,j} = \frac{1}{2} \left( \frac{1}{\Delta x^2} + \frac{1}{\Delta y^2} \right)^{-1} \left[ \frac{u_{i-1,j} + u_{i+1,j}}{\Delta x^2} + \frac{u_{i,j-1} + u_{i,j+1}}{\Delta y^2} - f_{i,j} \right]
+\end{equation*}
+If we set some {\em initial} condition $u^o_{i,j}$ we can iterate using the above equation
+\begin{equation*}
+u^{n+1}_{i,j} = \frac{1}{2} \left( \frac{1}{\Delta x^2} + \frac{1}{\Delta y^2} \right)^{-1} \left[ \frac{u^n_{i-1,j} + u^n_{i+1,j}}{\Delta x^2} + \frac{u^n_{i,j-1} + u^n_{i,j+1}}{\Delta y^2} - f_{i,j} \right]
+\end{equation*}
+which is known as the {\em Gauss-Seidel} method. The iterations must be performed until the norm of the residual $R$ is below some specified tolerance where the residual is defined as
+\begin{equation*}
+R = \sum_{i=2}^{n_x} \sum_{j=2}^{n_y} \left[ \frac{u_{i-1,j} - 2 u_{i,j} + u_{i+1,j}}{\Delta x^2} +
+\frac{u_{i,j-1} - 2 u_{i,j} + u_{i,j+1}}{\Delta y^2} - f_{i,j} \right]^2
+\end{equation*}
+
+The above scheme is implemented in fortran-95 and shown in figures (\ref{lap1})-(\ref{lap5}). For a discussion of fortran-95 language, see section (\ref{f95}). This example shows the use of two dimensional arrays, which is useful when solving a PDE using finite difference or finite volume method. The program is divided into many {\em subroutines}; a subroutine takes one or arguments, performs some computations and returns one or more results (unlike a function which returns only one value). For example, the subroutine {\tt InitCond} takes in {\tt nx,ny,dx,dy}, initializes the values for {\tt f, u} which are then returned back to the calling program. For continuing a long statement on a new line, an ampersand \& is used as in the subrutines {\tt Iterate} and {\tt Residue}. Compile this program as
+\begin{verbatim}
+$ gfortran -o laplace lap1.f95 lap2.f95 lap3.f95 lap4.f95 lap5.f95
+\end{verbatim}
+Run this program and visualize the output files using gnuplot as explained in section (\ref{gnu}). \\
+
+\noindent {\em Remark}:
+Fortran is by default not case sensitive; {\tt InitCond} and {\tt initcond} will refer to the same subroutine. This rule applies to variable names also.\\
+
+\noindent {\em Remark}:
+When the program is spread over many files, it can also be compiled in two steps. In the first step we create {\em object} files from every fortran source file
+\begin{verbatim}
+$ gfortran -c lap1.f95
+$ gfortran -c lap2.f95
+$ gfortran -c lap3.f95
+$ gfortran -c lap4.f95
+$ gfortran -c lap5.f95
+\end{verbatim}
+You should see a {\tt .o} file corresponding to every file you compiled above. Then in the second step we {\em link} all the object files to create the executable
+\begin{verbatim}
+$ gfortran -o laplace lap1.o lap2.o lap3.o lap4.o lap5.o
+\end{verbatim}
+If you change any of the files, it is sufficient to create a new object file for that file alone and perform the linking step. For large programs it is better to automate this process using {\em makefile}.
+
+%----------------------------------------------------------------------------
+\subsection{Variable types and arithmetic}
+
+Fortran has integer, single precision and double precision variables for arithmetic operations.
+\begin{verbatim}
+      integer p, q, r
+      real    x
+
+      r = p/q
+      x = p/q
+\end{verbatim}
+The result for different cases is given in table
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+p & q & r = p/q & x = p/q \\
+\hline
+1 & 2 & 0 & 0.0\\
+\hline
+2 & 1 & 2 & 2.0 \\
+\hline
+3 & 2 & 1 & 1.0 \\
+\hline
+\end{tabular}
+\end{center}
+In the example
+\begin{verbatim}
+      integer i
+      real    x, y
+
+      y = x * i / 100
+\end{verbatim}
+the answer will depend on whether the multiplication is executed first or the division. If division is executed first, then the answer may be wrong (with {\tt i=1}, we get {\tt y=0}). In this case it can be written as
+\begin{verbatim}
+      integer i
+      real    x, y
+
+      y = (x * i) / 100
+\end{verbatim}
+which forces the multiplication to be performed first. Consider another example
+\begin{verbatim}
+      integer i
+      real    x, y
+
+      y = x + i
+\end{verbatim}
+This statement will be correctly executed; the compiler converts {\tt i} to the same type as {\tt y} and performs the computation.
+
+Hence when using mixed variable types in a statement, you must be careful to check that you are getting the desired type of computation. When in doubt, you can convert an integer to a float using the {\tt real} and {\tt dble} function.
+
+%----------------------------------------------------------------------------
+\subsection{Common variables}
+
+Fortran has a feature to use global variables through a common block declaration. This is useful for storing values of constants like $\pi$ which may be required in different parts of a large program and also for storing array sizes. Many programmers put all variables in a common block to avoid having to pass them to subroutines. This is however bad programming practice since it does not have a clear distinction between data and procedures.
+
+In Fig. (\ref{common}) two common blocks are defined, one to store $\pi$ and another to store some dimensions. These variables are initialized in the main program and they can be accessed in a subroutine.
+
+%----------------------------------------------------------------------------
+\section{Programming in Fortran 95}
+\label{f95}
+Fortran 95 is a relatively new fortran standard that has several useful features. The syntax from fortran-77 is still valid in a fortran-95 program.
+
+\begin{itemize}
+
+\item The restriction of columns is removed; you can begin and end the program in any column. 
+
+\item Memory for arrays can be dynamically allocated. This is a very useful feature since you do not have to hard-code array sizes in the program which would have to be changed every time the problem size changes. Remember to deallocate the memory once the variable is no longer requires. Otherwise, your program can consume all the memory in the computer.
+\begin{verbatim}
+integer :: n
+real, allocatable :: x(:)
+read*,n
+allocate(x(n))
+.
+.
+.
+deallocate(x)
+\end{verbatim}
+
+\item Vector operations are possible. To assign zero to all elements of an array {\tt x(:)}, just use
+\begin{verbatim}
+x = 0.0
+\end{verbatim}
+or
+\begin{verbatim}
+x(:) = 0.0
+\end{verbatim}
+You can also use only a part of the array, for example
+\begin{verbatim}
+x(10:20) = 0.0
+\end{verbatim}
+will set the value zero to the array elements x(10) to x(20) only. Arrays can also be added or subtracted
+\begin{verbatim}
+z(:) = x(:) + y(:)
+\end{verbatim}
+Of course, this is possible only if all three arrays {\tt x, y, z} have the same size. Scalar multiplication is also possible,
+\begin{verbatim}
+y(:) = c * x(:)
+\end{verbatim}
+where {\tt c} is a number. The above rules also extend to multi-dimensional arrays in an obvious way.
+
+\item Pointers are also available in fortran-95 though in most cases, allocatable arrays are sufficient.
+
+\item Derived data types are also possible, similar to structures in C. For example a three dimensional vector type can be defined as
+\begin{verbatim}
+type v3d
+  real :: x, y, z
+end type v3d
+\end{verbatim}
+You can then define variables of type {\tt v3d} as follows, and access the members of the type
+\begin{verbatim}
+Type(v3d) :: vec
+
+vec%x = 0.1
+vec%y = 0.2
+vec%z = 0.3
+
+norm = sqrt( vec%x**2 + vec%y**2 + vec%z**2 )
+\end{verbatim}
+
+\end{itemize}
+
+%----------------------------------------------------------------------------
+\section{Visualization using {\tt gnuplot}}
+\label{gnu}
+
+Gnuplot is a free visualization tool for 1-, 2- and 3-D functions developed by the Free Software Foundation. For more information on gnuplot, go to the following website
+
+\begin{center}
+{\tt http://www.gnuplot.info}
+\end{center}
+Another excellent resource for gnuplot related information is the following website
+\begin{center}
+{\tt http://t16web.lanl.gov/Kawano/gnuplot/index-e.html}
+\end{center}
+To start gnuplot, just type its name in the terminal; you will get the command prompt {\tt gnuplot>} which is where you type all the commands. There is a lot of online help available within gnuplot using the {\tt help} command; for example type {\tt help plot} at the gnuplot prompt and read the manual.
+
+%----------------------------------------------------------------------------
+\subsection{Making xy plots or 1-D plots}
+Using the program {\tt sine.f} or any other program of your choice, generate a file containing two columns of numbers $(x_i, f(x_i))$. The function $f$ can be visualized in gnuplot using the following commands.
+
+%----------------------------------------------------------------------------
+\subsubsection{Plotting single curve}
+Plotting a single curve from the file {\tt sine.dat}:
+
+\begin{itemize}
+
+\item To plot using symbols
+\begin{verbatim}
+gnuplot> plot 'sine.dat' w p
+\end{verbatim}
+
+\item To plot using lines
+\begin{verbatim}
+gnuplot> plot 'sine.dat' w l
+\end{verbatim}
+
+\item To plot using both lines and symbols
+\begin{verbatim}
+gnuplot> plot 'sine.dat' w lp
+\end{verbatim}
+
+\end{itemize}
+Most gnuplot commands have a short form; thus {\tt plot} can be replaced with just {\tt p} as we do in the rest of the tutorial.
+
+%----------------------------------------------------------------------------
+\subsubsection{Plotting two curves}
+Plotting two curves on the same graph: Prepare a file {\tt cossin.dat} with three columns of data $(x_i, \cos(x_i), \sin(x_i))$
+
+\begin{itemize}
+
+\item To plot using different symbols
+\begin{verbatim}
+gnuplot> p 'cossin.dat' u 1:2 w p pt 1, 'cossin.dat' u 1:3 w p pt 2
+\end{verbatim}
+
+\item To plot using different lines
+\begin{verbatim}
+gnuplot> p 'cossin.dat' u 1:2 w l lt 1, 'cossin.dat' u 1:3 w l lt 2
+\end{verbatim}
+
+\item To plot using both lines and symbols
+\begin{verbatim}
+gnuplot> p 'cossin.dat' u 1:2 w lp lt 1 pt 1, \
+'cossin.dat' u 1:3 w lp lt 2 pt 2
+\end{verbatim}
+
+\end{itemize}
+
+%----------------------------------------------------------------------------
+\subsubsection{Using gnuplot from a script file}
+Instead of typing these commands every time, we can save them in a file and use it repeatedly. Save the following in a file called {\tt plt.gnu}
+%\begin{figure}
+\lstinputlisting{plt.gnu}
+%\end{figure}
+and inside gnuplot, do
+\begin{verbatim}
+gnuplot> load 'plt.gnu'
+\end{verbatim}
+All the commands in the file will be executed and you should see two curves with different symbols and line style. A legend will also appear for the two curves.
+
+%----------------------------------------------------------------------------
+\subsubsection{Logarithmic plots}
+Using the example program from section (\ref{lap}), generate the {\tt res.dat} file which contains two columns, iteration number and residual error. The error value ranges from an $O(1)$ quantity to a very small quantity; it is then better to plot the error in log scale. An example is given in the {\tt res.gnu} script
+\lstinputlisting{res.gnu}
+%----------------------------------------------------------------------------
+\subsubsection{Producing postscript file}
+Save the following gnuplot commands in a file {\tt ps.gnu}
+\lstinputlisting{ps.gnu}
+and execute it from the terminal (not from inside gnuplot)
+\begin{verbatim}
+$ gnuplot ps.gnu
+\end{verbatim}
+This should generate a postscript file called {\tt cossin.eps} which you can open in a postscript viewer like {\tt gv} or {\tt ggv} or {\tt kghostview}. To produce colored plots, use
+\begin{verbatim}
+set term postscript enhanced color
+\end{verbatim}
+Gnuplot also supports saving the plots in other formats like pdf, jpg, png, gif, etc. To see the supported formats, type {\tt help term} at the gnuplot command prompt.
+
+%----------------------------------------------------------------------------
+\subsection{Making 2-D plots}
+Two dimensional plots may be surface plots or contour plots. The data for a 2-D plot consists of a function defined on a 2-D grid of points of size $n_x \times n_y$. The data must be prepared using the following format:
+\begin{verbatim}
+      do i=1,nx
+         do j=1,ny
+            write(fid,*) x(i,j), y(i,j), u(i,j)
+         enddo
+         write(fid,*)
+      enddo
+\end{verbatim}
+If you execute the example code from section (\ref{lap}), it generates a file {\tt u.dat} which is in the above format. Then use the following gnuplot script to plot the solution as a surface and contour.
+\lstinputlisting{surf.gnu}
+You can use the left mouse button to rotate the figure and the middle mouse button to zoom in and out. To plot using only contours, use the following script
+\lstinputlisting{cont.gnu}
+Note that number of contour levels to plot is given by the {\tt set cntrparam} statement; in the example, 25 equally spaced values between and minimum and maximum are used. To specify the levels explictly, you can use
+\begin{verbatim}
+set cntrparam levels discrete 0, 0.1, 0.2, 0.3, 0.4, 0.5
+\end{verbatim}
+or
+\begin{verbatim}
+set cntrparam levels incremental 0, 0.01, 1
+\end{verbatim}
+
+%----------------------------------------------------------------------------
+\section{Some advice on good programming habits}
+
+There can be quite a lot of work involved in taking a numerical scheme from paper to a working code. Mistakes invariably occur and can be quite difficult to detect. However they can be considerably minimized by following some programming habits.
+
+\begin{itemize}
+
+\item Plan your program as much as possible on paper.
+
+\item Write the code in a clean and organized way. Use proper indentation.
+
+\item Give natural names to variables
+
+\item Write comments to explain what is happening in each part of the program.
+
+\item Encapsulate common procedures in a function or subroutine.
+
+\item Read parameters from an external file instead of modifying the program every time you change the value of some parameter.
+
+\item Always check the validity of every variable if you think that it may be wrong. For example if some variable must always be positive, check that it is actually so before using it.
+
+\item Print important variables to screen so that you can verify everything is initialized correctly.
+
+\item When you are using arrays, make sure you do not exceed the array bounds. For example if you have an array of size 100, say {\tt val(100)}, then you should not try to use the value {\tt val(101)} since it is out of bounds. Using an array out of its bounds leads to {\em segmentation fault}.
+
+\item Test the program on a problem whose solution is known to you. This can reveal mistakes you might have committed.
+
+\item Do not use {\tt goto} statements. This makes the code difficult to understand and debug in case of mistakes.
+
+\item Beware of using uninitialized variables. Many compiler have options to check this. For example, with gfortran, use the flag {\tt -Wall} which causes the compiler to do many checks and issue warnings.
+
+\end{itemize}
+
+%----------------------------------------------------------------------------
+\section{Exercises}
+
+You can do the following exercises in any of the languages: fortran-77, fortran-95 or C. However I recommend fortran-95 or C. All programs must contain a header comment giving information about your name, date of creation of the program and a brief description of the program. There must be comments describing the action taking place in different parts of the program. Weightage will be given if you follow the good programming habits discussed above.
+
+%----------------------------------------------------------------------------
+\subsection{Machine precision}
+Find the smallest positive number $n$ such that $1 + 1/2^n == 1$. Write two programs, one in single precision and the other in double precision.
+
+%----------------------------------------------------------------------------
+\subsection{Roots of a quadratic}
+Write a program to find the roots of a quadratic equation $ax^2 + bx + c=0$. The program must read in the values of $a,b,c$ and print the two roots to the screen. It must also be able to check and compute complex roots.
+
+%----------------------------------------------------------------------------
+\subsection{Euler method}
+\label{euler}
+Write a fortran program to solve an ODE using Euler method.
+\begin{eqnarray*}
+\dd{u}{t} &=& f(u,t), \quad t > t_o \\
+u(t_o) &=& u_o
+\end{eqnarray*}
+The quantities $t_o, u_o, t_f, N$ must be read from a file. The positive integer $N$ is the number of time steps taken to go from $t_o$ to $t_f$, so that the time-step interval is $\Delta t = (t_f-t_o)/(N-1)$. The function $f(u,t)$ must be computed by a fortran function. The Euler method is given by
+\begin{equation}
+u^{n+1} = u^n + \Delta t f(u^n, t^n), \quad t^n = t_0 + n \Delta t, \quad n=0,1,2,\ldots
+\end{equation}
+As a specific example, solve the ODE
+\begin{eqnarray*}
+\dd{u}{t} &=& \cos t, \quad t > 0 \\
+u(0) &=& 0
+\end{eqnarray*}
+until the final time $t_f = 2\pi$. The exact solution is $u(t) = \sin t$; plot the numerical solution and exact solution using gnuplot. Do this for $N=100, 200, 300, 400, 500$. The program must ask the user to enter the values of $N$ and $t_f$.
+
+%----------------------------------------------------------------------------
+\subsection{Runge-Kutta method}
+
+Consider the ODE problem from (\ref{euler}). The $m$'th order Runge-Kutta method is given by
+\begin{eqnarray*}
+u^{(0)} &=& u^n \\
+u^{(s+1)} &=& u^n + \frac{\Delta t}{m-s} f(u^{(s)}, t^n+\Delta t/(m-s)), \quad s=0,\ldots,m-1\\
+u^{n+1} &=& u^{(m)}
+\end{eqnarray*}
+For $m=1$ this becomes the Euler method. Write a program to solve the ODE using Runge-Kutta method of any order $m$. The program must ask the user for $N, t_f, m$. Compare the solution for $N=100$ and $m=1,2,3,4$.
+
+%----------------------------------------------------------------------------
+\subsection{Finite volume method}
+Write a fortran program to solve the following conservation law
+\begin{eqnarray*}
+\df{u}{t} + \df{}{x}f(u) &=& 0, \quad x \in (a,b), \quad 0 < t \le t_f \\
+u(x,0) &=& u_o(x), \quad x \in [a,b]
+\end{eqnarray*}
+Divide the computational domain $[a,b]$ into $N$ equal partitions of length $\Delta x = (b-a)/(N-1)$
+\begin{equation*}
+a=x_{1/2} < x_{2/2} < x_{3/2} \ldots < x_{N-1/2} < x_{N+1/2} = b
+\end{equation*}
+The finite volume scheme is obtained by integrating the PDE over each cell; for the $i$'th cell $C_i = (x_{i-1/2}, x_{i+1/2})$ we get
+\begin{equation*}
+\dd{u_i}{t} + \frac{F_{i+1/2} - F_{i-1/2}}{\Delta x} = 0
+\end{equation*}
+where $F_{i+1/2} = F(u_i,u_{i+1})$ is a numerical flux function. This gives us a system of ODE
+\begin{equation*}
+\dd{u_i}{t} = R_i(u) := - \frac{F_{i+1/2} - F_{i-1/2}}{\Delta x}, \quad i=2,\ldots N-1
+\end{equation*}
+We keep the solution in cell 1 and $N$ fixed since otherwise some boundary condition will be required. The residual computation requires the fluxes  $F_{3/2}$ to $F_{N-1/2}$.  The finite volume residual must be computed without duplicating the flux computation. Use the flux function
+\begin{equation*}
+F(u_i, u_{i+1}) = \frac{1}{2}(f_i + f_{i+1}) - \frac{1}{2} | a_{i+1/2} | (u_{i+1} - u_i)
+\end{equation*}
+where
+\begin{equation*}
+a_{i+1/2} = \left\{ \begin{array}{cc}
+\frac{ f_{i+1} - f_i }{u_{i+1} - u_i} & u_i \ne u_{i+1} \\
+f'(u_i) & u_i = u_{i+1}
+\end{array} \right.
+\end{equation*}
+The time-step $\Delta t$ must satisfy the stability condition
+\begin{equation*}
+\frac{\Delta t \max_u | f'(u) |}{\Delta x} \le 1
+\end{equation*}
+Take the following problem: $a=0$, $b=2$, $f(u) = u^2/2$,
+\begin{equation*}
+u_o(x) = \left\{ \begin{array}{cc}
+\sin^2(2\pi (x-1/4)) & 0.25 \le x \le 0.75 \\
+0                  & \textrm{otherwise}
+\end{array} \right.
+\end{equation*}
+The program must have subroutines to:
+\begin{itemize}
+\item read $a,b,\Delta t, N, t_f$ from a file
+\item check that $\Delta t$ satisfies stability condition
+\item set initial condition
+\item compute finite volume residual
+\item compute flux function
+\item save final solution to a file
+\end{itemize}
+%----------------------------------------------------------------------------
+\subsection{Finite difference method: Solution of Poisson equation}
+
+Rewrite the program to solve the Poisson equation in an arbitrary rectangle $(x_m,x_M) \times (y_m,y_M)$ in two dimensions.
+
+\begin{enumerate}
+\item The program must read $n_x, n_y, x_m, x_M, y_m, y_M$, MAXITER, TOL from an input file.
+\item Make separate subroutines to set the boundary condition, initial condition and the right hand side $f$.
+\item Plot the solution using surface and contours; put labels and title.
+\end{enumerate}
+
+%----------------------------------------------------------------------------
+\begin{thebibliography}{99}
+
+\bibitem{lip} S. Lipschultz and A. Poe, {\em Theory and problems of programming with Fortran}, McGraw-Hill Book Company.
+
+\bibitem{nyhoff} L. Nyhoff and S. Leestma, {\em Introduction to Fortran 90 for engineers and scientists}, Prentice Hall, 1997.
+
+\bibitem{chapman} S. J. Chapman, {\em Fortran 77 for engineers and scientists with an introduction to Fortran 90}, Harper Collins, 1995.
+
+\bibitem{press} W. H. Press et al., {\em Numerical recipes in Fortran: The art of scientific computing}, Cambridge University Press, 1992.
+
+\bibitem{metcalf} M. Metcalf, J. Reid and M. Cohen, {\em Fortran 95/2003 Explained}, Oxford University Press, 2004.
+
+\end{thebibliography}
+
+% All code examples are below
+%\pagebreak
+\newpage
+
+\begin{figure}
+\lstinputlisting{hello.f}
+\caption{First fortran 77 program: {\tt hello.f}}
+\label{hello}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{add.f}
+\caption{Adding two real numbers: {\tt add.f}}
+\label{add}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{compare.f}
+\caption{Arithmetic comparison operators: {\tt compare.f}}
+\label{compare}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{array_sum.f}
+\caption{Adding a finite sequence of numbers: {\tt array\_sum.f}}
+\label{arraysum}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{sine.f}
+\caption{Writing to a file: {\tt sine.f}}
+\label{sine}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{newton.f}
+\caption{Newton-Raphson method: {\tt newton.f}}
+\label{newton}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{lap1.f95}
+\caption{Solution of Poisson equation: {\tt lap1.f95}}
+\label{lap1}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{lap2.f95}
+\caption{Solution of Poisson equation: {\tt lap2.f95}}
+\label{lap2}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{lap3.f95}
+\caption{Solution of Poisson equation: {\tt lap3.f95}}
+\label{lap3}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{lap4.f95}
+\caption{Solution of Poisson equation: {\tt lap4.f95}}
+\label{lap4}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{lap5.f95}
+\caption{Solution of Poisson equation: {\tt lap5.f95}}
+\label{lap5}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{common.f}
+\caption{Use of common variables: {\tt common.f}}
+\label{common}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{common.h}
+\caption{Include file used in Fig. \ref{common3}: {\tt common.h}}
+\label{common2}
+\end{figure}
+
+\begin{figure}
+\lstinputlisting{common2.f}
+\caption{Program of Fig. \ref{common} written with include file: {\tt common2.f}}
+\label{common3}
+\end{figure}
+
+\end{document}  

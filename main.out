@@ -1,0 +1,26 @@
+\BOOKMARK [1][-]{section.1}{1. Introduction}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{1.1. Pre-requisites}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{1.2. Language and compilers}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{2. Programming in fortran 77}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{2.1. Example: Adding two numbers}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.2}{2.2. Example: Comparing two numbers}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.3}{2.3. Example: Sum of a sequence of numbers}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.4}{2.4. Example: Writing to a file}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.5}{2.5. Example: Reading from a file}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.6}{2.6. Example: Finding zeros of a function using Newton method}{section.2}% 10
+\BOOKMARK [2][-]{subsection.2.7}{2.7. Example: Solving two dimensional Laplace equation}{section.2}% 11
+\BOOKMARK [2][-]{subsection.2.8}{2.8. Variable types and arithmetic}{section.2}% 12
+\BOOKMARK [2][-]{subsection.2.9}{2.9. Common variables}{section.2}% 13
+\BOOKMARK [1][-]{section.3}{3. Programming in Fortran 95}{}% 14
+\BOOKMARK [1][-]{section.4}{4. Visualization using gnuplot}{}% 15
+\BOOKMARK [2][-]{subsection.4.1}{4.1. Making xy plots or 1-D plots}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.2}{4.2. Making 2-D plots}{section.4}% 17
+\BOOKMARK [1][-]{section.5}{5. Some advice on good programming habits}{}% 18
+\BOOKMARK [1][-]{section.6}{6. Exercises}{}% 19
+\BOOKMARK [2][-]{subsection.6.1}{6.1. Machine precision}{section.6}% 20
+\BOOKMARK [2][-]{subsection.6.2}{6.2. Roots of a quadratic}{section.6}% 21
+\BOOKMARK [2][-]{subsection.6.3}{6.3. Euler method}{section.6}% 22
+\BOOKMARK [2][-]{subsection.6.4}{6.4. Runge-Kutta method}{section.6}% 23
+\BOOKMARK [2][-]{subsection.6.5}{6.5. Finite volume method}{section.6}% 24
+\BOOKMARK [2][-]{subsection.6.6}{6.6. Finite difference method: Solution of Poisson equation}{section.6}% 25
+\BOOKMARK [1][-]{section*.1}{References}{}% 26

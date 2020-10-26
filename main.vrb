@@ -1,0 +1,22 @@
+\frametitle {Platform and tools}
+
+  \begin{itemize}
+
+  \item Check if the compiler is installed
+
+  \item C compiler
+
+  \begin{verbatim}
+  $ cc
+  gcc: no input files
+  \end{verbatim}
+
+  \item Fortran compiler
+
+  \begin{verbatim}
+  $ gfortran
+  gfortran: no input files
+  \end{verbatim}
+
+  \end{itemize}
+

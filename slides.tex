@@ -1,0 +1,155 @@
+% $Header: /cvsroot/latex-beamer/latex-beamer/solutions/conference-talks/conference-ornate-20min.en.tex,v 1.6 2004/10/07 20:53:08 tantau Exp $
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Madrid}
+  % or ...
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+
+%\usepackage{graphicx}
+%\usepackage{aliases}
+\usepackage{verbatim}
+
+\usepackage[english]{babel}
+% or whatever
+
+%\usepackage[latin1]{inputenc}
+% or whatever
+
+\usepackage{times}
+%\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+
+
+\title[Tutorial on computing] % (optional, use only with long paper titles)
+{Tutorial on computing}
+
+%\subtitle
+%{Include Only If Paper Has a Subtitle}
+
+\author[] % (optional, use only with lots of authors)
+{Praveen. C}
+% - Give the names in the same order as the appear in the paper.
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+\institute[TIFR-CAM] % (optional, but mostly needed)
+{
+   TIFR-CAM \\
+   Bangalore \\
+{\tt praveen@math.tifrbng.res.in} \\
+}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[19 March, 2008] % (optional, should be abbreviation of conference name)
+{19 March, 2008}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Computing}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>
+%    \frametitle{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents
+  % You might wish to add the option [pausesections]
+\end{frame}
+%#############################################################################
+\section{Platform and tools}
+%-----------------------------------------------------------------------------
+\begin{frame}[fragile]
+  \frametitle{Platform and tools}
+
+  \begin{itemize}
+
+  \item We will use a UNIX or Linux-style OS (includes MACOSX)
+  \item Command prompt denoted with a dollar sign
+  \begin{verbatim}
+  $
+  \end{verbatim}
+  \item C compilers
+
+  \begin{itemize}
+  \item GNU: gcc/cc, g++
+  \item Intel: icc
+  \item PGI: pgcc
+  \end{itemize}
+
+  \item Fortran compilers
+
+  \begin{itemize}
+  \item GNU: g77 (old), gfortran
+  \item Intel: ifort
+  \item PGI: pgf77, pgf90, pgf95
+  \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+%-----------------------------------------------------------------------------
+\begin{frame}[fragile]
+  \frametitle{Platform and tools}
+
+  \begin{itemize}
+
+  \item Check if the compiler is installed
+
+  \item C compiler
+
+  \begin{verbatim}
+  $ cc
+  gcc: no input files
+  \end{verbatim}
+
+  \item Fortran compiler
+
+  \begin{verbatim}
+  $ gfortran
+  gfortran: no input files
+  \end{verbatim}
+
+  \end{itemize}
+
+\end{frame}
+%-----------------------------------------------------------------------------
+\end{document}
