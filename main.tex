@@ -1,6 +1,6 @@
 \documentclass[11pt,oneside]{amsart}
 \usepackage[width=16cm,height=25cm]{geometry}
-\geometry{a4paper}                   % ... or a4paper or a5paper or ... 
+\geometry{a4paper}                   % ... or a4paper or a5paper or ...
 %\geometry{landscape}                % Activate for for rotated page geometry
 %\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{listings}
@@ -36,7 +36,7 @@
 numbers=left,numberstyle=\footnotesize}
 
 \section{Introduction}
-In this tutorial, we will learn the basics of programming with a view towards numerical computing. We will study and write simple programs\footnote{We will use the terms {\em program} and {\em code} to refer to a computer program.} in fortran to solve some elementary problems in numerical analysis. The best way to learn a new programming language is to read many examples of code and to actually write your own code. So the tutorial will give you many examples of small computer codes which solve some equation. The theory behind the numerical method will not be explained in this tutorial. It is assumed that you already have some knowledge with numerical analysis, like root finding, solution of system of linear equations, solution of ODE and PDE. However in every example the numerical recipe will be fully given so that you can use it to write a program. You will also learn the use of plotting software to visualize the results of  numerical computing. 
+In this tutorial, we will learn the basics of programming with a view towards numerical computing. We will study and write simple programs\footnote{We will use the terms {\em program} and {\em code} to refer to a computer program.} in fortran to solve some elementary problems in numerical analysis. The best way to learn a new programming language is to read many examples of code and to actually write your own code. So the tutorial will give you many examples of small computer codes which solve some equation. The theory behind the numerical method will not be explained in this tutorial. It is assumed that you already have some knowledge with numerical analysis, like root finding, solution of system of linear equations, solution of ODE and PDE. However in every example the numerical recipe will be fully given so that you can use it to write a program. You will also learn the use of plotting software to visualize the results of  numerical computing.
 
 \subsection{Pre-requisites}
 
@@ -56,7 +56,7 @@ The steps you would execute in solving some problem on the computer are:
 \item Run it and look at the results
 \end{enumerate}
 
-Of course in practice, you make mistakes which lead to {\em bugs} in the code. If you do any serious amount of numerical computing, you can expect to spend a considerable amount of time in finding and correcting your own mistakes; this is known as {\em debugging}. 
+Of course in practice, you make mistakes which lead to {\em bugs} in the code. If you do any serious amount of numerical computing, you can expect to spend a considerable amount of time in finding and correcting your own mistakes; this is known as {\em debugging}.
 
 Today there are several fortran compilers available; some of these are free while others cost money.
 
@@ -132,15 +132,15 @@ $ gfortran -fdefault-real-8 -o add add.f
 Running the program now produces the following output: note that the number of decimal places is more now.\footnote{Warning: In-spite of this, do not depend on what is printed on the screen to decide the precision; how many decimal places are printed depends on the compiler and not on the actual precision with which the numbers are stored.}
 \begin{verbatim}
 $ ./add
- a   =  1.00000000000000000     
- b   =   2.0000000000000000     
+ a   =  1.00000000000000000
+ b   =   2.0000000000000000
  sum =   3.0000000000000000
  \end{verbatim}
- 
+
  \noindent {\bf Remark}: More accurately, the precision of a number type on a computer is the largest number $\epsilon$ such that the computer cannot distinguish between $1$ and $1 + \epsilon$.
- 
+
  %----------------------------------------------------------------------------
-\subsection{Example: Comparing two numbers}
+\subsection{Example {\tt add.f}: Comparing two numbers}
 
 This example shows how to use comparison operators in fortran. The result of applying a comparison operator to two numbers is a {\em logical}, i.e., the result is either true or false. Table \ref{tab:comp} gives the comparison operators in fortran. Run the example code in Fig. \ref{compare} and see the output for different values of input. This example also introduces the {\tt if ... else ... endif} statement which naturally arises when you want to compare numbers.
 
@@ -155,7 +155,7 @@ Equal to  & $=$ & {\tt .eq.} \\
 Less than & $<$ & {\tt .lt.} \\
 \hline
 Greater than & $>$ & {\tt .gt.} \\
-\hline 
+\hline
 Less than or equal to & $\le$ & {\tt .le.} \\
 \hline
 Greater than or equal to & $\ge$ & {\tt .ge.} \\
@@ -169,7 +169,7 @@ Greater than or equal to & $\ge$ & {\tt .ge.} \\
 Because of the finite precision of a computer, real numbers cannot be stored exactly. For example the number 1/3 which has an infinite decimal representation is only stored approximately in a computer. If you compute {\tt 3.0 * (1.0 / 3.0)} on a computer, the answer is not exactly 1.0; hence one should be careful in making comparisons of real numbers.
 
 %----------------------------------------------------------------------------
-\subsection{Example: Sum of a sequence of numbers}
+\subsection{Example {\tt array\_sum.f}: Sum of a sequence of numbers}
 
 This example illustrates the use of an {\tt array} of numbers. The code computes the sum of {\tt n} numbers. The numbers are stored in an array of real variables called {\tt val}; note that the memory for this array is allocated at the same time the variable is declared. In fortran-77, the size of an array is hard-coded into the program. In this example we declare a {\em constant} {\tt nmax} using the {\tt parameter} statement, which is the size of the array. The actual size {\tt n} of the array that the user wants to add is then read by prompting the user to enter a number. It is always good practice to check that any value entered by the user is {\em valid} for the purpose that it will be used. For example, in the present case, if the user requests to add 1000 numbers, the program will not work because it can handle at most 100 numbers (since we have {\tt nmax=100}). Also {\tt n} should be a positive integer, since otherwise the sum does not make sense.
 
@@ -338,7 +338,7 @@ Run this program and visualize the output files using gnuplot as explained in se
 Fortran is by default not case sensitive; {\tt InitCond} and {\tt initcond} will refer to the same subroutine. This rule applies to variable names also.\\
 
 \noindent {\em Remark}:
-When the program is spread over many files, it can also be compiled in two steps. In the first step we create {\em object} files from every fortran source file
+When the program is spread over many files, it can also be compiled in two steps. In the first step we create {\em object} files from every fortran source file by {\em compiling} each source file
 \begin{verbatim}
 $ gfortran -c lap1.f95
 $ gfortran -c lap2.f95
@@ -416,7 +416,7 @@ Fortran 95 is a relatively new fortran standard that has several useful features
 
 \begin{itemize}
 
-\item The restriction of columns is removed; you can begin and end the program in any column. 
+\item The restriction of columns is removed; you can begin and end the program in any column.
 
 \item Memory for arrays can be dynamically allocated. This is a very useful feature since you do not have to hard-code array sizes in the program which would have to be changed every time the problem size changes. Remember to deallocate the memory once the variable is no longer requires. Otherwise, your program can consume all the memory in the computer.
 \begin{verbatim}
@@ -428,6 +428,10 @@ allocate(x(n))
 .
 .
 deallocate(x)
+\end{verbatim}
+When declaring several arrays of same rank, we can also do this
+\begin{verbatim}
+real,allocatable,dimension(:,:) :: x, y, z
 \end{verbatim}
 
 \item Vector operations are possible. To assign zero to all elements of an array {\tt x(:)}, just use
@@ -452,7 +456,13 @@ y(:) = c * x(:)
 \end{verbatim}
 where {\tt c} is a number. The above rules also extend to multi-dimensional arrays in an obvious way.
 
-\item Pointers are also available in fortran-95 though in most cases, allocatable arrays are sufficient.
+Multiplying two arrays {\tt x, y} like this
+\begin{verbatim}
+z = x * y
+\end{verbatim}
+causes element-wise multiplication. Of course, all three arrays must have same size.
+
+\item Pointers are also available in fortran-95 though in most cases they are not required, and  allocatable arrays are sufficient.
 
 \item Derived data types are also possible, similar to structures in C. For example a three dimensional vector type can be defined as
 \begin{verbatim}
@@ -834,4 +844,4 @@ Rewrite the program to solve the Poisson equation in an arbitrary rectangle $(x_
 \label{common3}
 \end{figure}
 
-\end{document}  
+\end{document}
